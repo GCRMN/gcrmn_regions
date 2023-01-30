@@ -1,4 +1,4 @@
-# gcrmndb_regions <img src='figs/logo_gcrmn.png' align="right" height="138.5" />
+# gcrmndb_regions <img src='figs/logo_gcrmn.png' align="right" height="100" />
 
 ## 1. Introduction
 
