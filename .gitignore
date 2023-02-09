@@ -1,4 +1,12 @@
+# base #
+########
+
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
+
+# folder #
+##########
+
+data/natural-earth-data/

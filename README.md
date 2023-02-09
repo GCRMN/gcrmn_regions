@@ -1,4 +1,4 @@
-# gcrmndb_regions <img src='figs/logo_gcrmn.png' align="right" height="100" />
+# gcrmn_regions <img src='figs/logo_gcrmn.png' align="right" height="100" />
 
 ## 1. Introduction
 
@@ -13,3 +13,4 @@
 * South Asia
 * WIO = Western Indian Ocean
 
+[gcrmn_regions]("figs/map_regions.png")
