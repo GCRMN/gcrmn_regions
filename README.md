@@ -13,4 +13,4 @@
 * South Asia
 * WIO = Western Indian Ocean
 
-[gcrmn_regions]("figs/map_regions.png")
+![gcrmn_regions](figs/map_regions.png)
