@@ -76,6 +76,7 @@ ggplot() +
         legend.background = element_rect(fill = "transparent", color = NA),
         legend.title = element_blank(),
         panel.background = element_blank(),
-        plot.background = element_rect(fill = "transparent", color = NA))
+        plot.background = element_rect(fill = "transparent", color = NA)) +
+  guides(fill = guide_legend(override.aes = list(size = 5, color = NA)))
 
 ggsave("figs/map_regions.png", bg = "transparent")
