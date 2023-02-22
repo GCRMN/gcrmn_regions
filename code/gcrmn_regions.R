@@ -5,7 +5,7 @@ library(sf)
 
 # 2. Load and assign GCRMN region ----
 
-data_gcrmn_regions <- st_read("data/Marine_Ecoregions_Of_the_World__MEOW_.shp") %>% 
+data_gcrmn_regions <- st_read("data/meow/Marine_Ecoregions_Of_the_World__MEOW_.shp") %>% 
   st_transform(crs = 4326) %>% 
   mutate(gcrmn_region = case_when(ECO_CODE_X %in% c(202, 203, 204, 205, 206, 207, 208, 209, 210, 211,
                                                     120, 145, 144, 141, 140, 142, 143, 150, 151) ~ "Australia",
@@ -37,7 +37,9 @@ data_gcrmn_regions <- nngeo::st_remove_holes(data_gcrmn_regions)
 
 # 4. Export the data ----
 
-save(data_gcrmn_regions, file = "data/gcrmn_regions.RData")
+save(data_gcrmn_regions, file = "data/gcrmn-regions/gcrmn_regions.RData")
+
+st_write(obj = data_gcrmn_regions, dsn = "data/gcrmn-regions/gcrmn_regions.shp", delete_dsn = TRUE)
 
 # 5. Make the plot ----
 
@@ -79,4 +81,4 @@ ggplot() +
         plot.background = element_rect(fill = "transparent", color = NA)) +
   guides(fill = guide_legend(override.aes = list(size = 5, color = NA)))
 
-ggsave("figs/map_regions.png", bg = "transparent")
+ggsave("figs/map_regions.png", bg = "transparent", height = 5, width = 8)

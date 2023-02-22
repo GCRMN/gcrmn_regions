@@ -21,7 +21,7 @@ The goal of this repository is to provide the R code used to create the 10 GCRMN
 
 ## 2. How the regions were created?
 
-The raw data used to create the ten GCRMN regions where obtained from the *Marine Ecoregions of the World* ([Spalding *et al.*, 2007](https://doi.org/10.1641/B570707)). The corresponding shapefile of these raw data are located in `data` (*Marine_Ecoregions_Of_the_World__MEOW_.shp*). The ecoregions were aggregated to create the ten GCRMN regions. The resulting file is located in `data` (*gcrmn_regions.RData*).
+The raw data used to create the ten GCRMN regions where obtained from the *Marine Ecoregions of the World* ([Spalding *et al.*, 2007](https://doi.org/10.1641/B570707)). The corresponding shapefile of these raw data are located in `data\meow` (*Marine_Ecoregions_Of_the_World__MEOW_.shp*). The ecoregions were aggregated to create the ten GCRMN regions. The resulting data are located in `data\gcrmn-regions`, either in RData (*gcrmn_regions.RData*) or in shapefile format (*gcrmn_regions.shp*).
 
 
 ## 3. References
