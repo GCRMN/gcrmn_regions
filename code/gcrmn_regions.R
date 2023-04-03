@@ -33,7 +33,9 @@ data_gcrmn_regions <- st_read("data/meow/Marine_Ecoregions_Of_the_World__MEOW_.s
 
 # 3. Fill holes within polygons ----
 
-data_gcrmn_regions <- nngeo::st_remove_holes(data_gcrmn_regions)
+data_gcrmn_regions <- nngeo::st_remove_holes(data_gcrmn_regions) %>% 
+  st_transform(crs = 4326) %>% 
+  st_make_valid()
 
 # 4. Export the data ----
 
