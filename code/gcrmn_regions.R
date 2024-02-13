@@ -2,6 +2,8 @@
 
 library(tidyverse)
 library(sf)
+library(extrafont)
+windowsFonts("Open Sans" = windowsFont("Open Sans"))
 
 # 2. Load and assign GCRMN region ----
 
@@ -47,10 +49,10 @@ st_write(obj = data_gcrmn_regions, dsn = "data/gcrmn-regions/gcrmn_regions.shp",
 
 # 5.1 Load Natural Earth Data --
 
-data_lands <- st_read("data/natural-earth-data/ne_10m_land/ne_10m_land.shp") %>% 
+data_country <- st_read("data/natural-earth-data/ne_10m_admin_0_countries/ne_10m_admin_0_countries.shp") %>% 
   st_transform(crs = "+proj=eqearth")
 
-data_country <- st_read("data/natural-earth-data/ne_10m_admin_0_countries/ne_10m_admin_0_countries.shp") %>% 
+data_graticules <- st_read("data/natural-earth-data/ne_10m_graticules_20/ne_10m_graticules_20.shp")%>% 
   st_transform(crs = "+proj=eqearth")
 
 # 5.2 Change projection of GCRMN regions --
@@ -72,15 +74,17 @@ background_map_border <- list(cbind(longs, lats)) %>%
 # 5.4 Create the plot --
 
 ggplot() +
-  geom_sf(data = background_map_border, fill = "#56B4E950", color = "grey30", linewidth = 0.25) +
+  geom_sf(data = background_map_border, fill = "white", color = "grey30", linewidth = 0.25) +
+  geom_sf(data = data_graticules, color = "#ecf0f1", linewidth = 0.25) +
+  geom_sf(data = background_map_border, fill = NA, color = "grey30", linewidth = 0.25) +
   geom_sf(data = data_gcrmn_regions, aes(fill = gcrmn_region)) +
-  geom_sf(data = data_lands) +
-  geom_sf(data = data_country) +
-  theme(legend.position = "bottom",
+  geom_sf(data = data_country, color = "#24252a", fill = "#dadfe1") +
+  theme(text = element_text(family = "Open Sans"),
+        legend.position = "bottom",
         legend.background = element_rect(fill = "transparent", color = NA),
         legend.title = element_blank(),
         panel.background = element_blank(),
         plot.background = element_rect(fill = "transparent", color = NA)) +
   guides(fill = guide_legend(override.aes = list(size = 5, color = NA)))
 
-ggsave("figs/map_regions.png", bg = "transparent", height = 5, width = 8)
+ggsave("figs/map_regions.png", bg = "transparent", height = 5, width = 8, dpi = 300)
