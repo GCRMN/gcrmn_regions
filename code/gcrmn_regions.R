@@ -103,10 +103,7 @@ data_gcrmn_regions <- nngeo::st_remove_holes(data_gcrmn_regions) %>%
 
 ## 4.1 GCRMN subregions ----
 
-data_gcrmn_subregions <- data_gcrmn_regions %>% 
-  select(-gcrmn_region)
-
-data_gcrmn_subregions <- nngeo::st_remove_holes(data_gcrmn_subregions) %>% 
+data_gcrmn_subregions <- nngeo::st_remove_holes(data_gcrmn_regions) %>% 
   st_transform(crs = 4326) %>% 
   st_make_valid()
 
@@ -119,7 +116,7 @@ st_write(obj = data_gcrmn_subregions, dsn = "data/gcrmn-regions/gcrmn_subregions
 data_gcrmn_regions <- data_gcrmn_regions %>% 
   select(-gcrmn_subregion) %>% 
   group_by(gcrmn_region) %>% 
-  summarise() %>% 
+  summarise(geometry = st_union(geometry)) %>% 
   ungroup()
 
 data_gcrmn_regions <- nngeo::st_remove_holes(data_gcrmn_regions) %>% 
