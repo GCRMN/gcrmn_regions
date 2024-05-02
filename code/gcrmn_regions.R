@@ -60,6 +60,7 @@ data_gcrmn_regions <- st_read("data/meow/Marine_Ecoregions_Of_the_World__MEOW_.s
                                      ECO_CODE_X %in% c(140, 141, 144, 145, 210, 211) ~ 2,
                                      ECO_CODE_X %in% c(120) ~ 3,
                                      ECO_CODE_X %in% c(151) ~ 4,
+                                     ECO_CODE_X %in% c(150) ~ 5,
                                      # Pacific
                                      ECO_CODE_X %in% c(121, 122, 124, 125) ~ 1,
                                      ECO_CODE_X %in% c(134, 135, 136, 137) ~ 2,
