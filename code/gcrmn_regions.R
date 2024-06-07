@@ -10,7 +10,7 @@ windowsFonts("Open Sans" = windowsFont("Open Sans"))
 data_gcrmn_regions <- st_read("data/meow/Marine_Ecoregions_Of_the_World__MEOW_.shp") %>% 
   st_transform(crs = 4326) %>% 
   # GCRMN region
-  mutate(gcrmn_region = case_when(ECO_CODE_X %in% c(202, 203, 204, 205, 206, 207, 208, 209, 210, 211,
+  mutate(region = case_when(ECO_CODE_X %in% c(202, 203, 204, 205, 206, 207, 208, 209, 210, 211,
                                                     120, 145, 144, 141, 140, 142, 143, 150, 151) ~ "Australia",
                                   ECO_CODE_X %in% c(90, 91, 92) ~ "ROPME",
                                   ECO_CODE_X %in% c(87, 88, 89) ~ "PERSGA",
@@ -28,7 +28,7 @@ data_gcrmn_regions <- st_read("data/meow/Marine_Ecoregions_Of_the_World__MEOW_.s
                                                     162, 158, 161, 160, 156, 155, 157, 146) ~ "Pacific",
                                   TRUE ~ NA_character_)) %>% 
   # GCRMN subregion
-  mutate(gcrmn_subregion = case_when(# ROPME
+  mutate(subregion = case_when(# ROPME
                                      ECO_CODE_X %in% c(90) ~ 1,
                                      ECO_CODE_X %in% c(91) ~ 2,
                                      ECO_CODE_X %in% c(92) ~ 3,
@@ -62,7 +62,7 @@ data_gcrmn_regions <- st_read("data/meow/Marine_Ecoregions_Of_the_World__MEOW_.s
                                      ECO_CODE_X %in% c(151) ~ 4,
                                      ECO_CODE_X %in% c(150) ~ 5,
                                      # Pacific
-                                     ECO_CODE_X %in% c(121, 122, 124, 125) ~ 1,
+                                     ECO_CODE_X %in% c(121, 122, 123, 124, 125) ~ 1,
                                      ECO_CODE_X %in% c(134, 135, 136, 137) ~ 2,
                                      ECO_CODE_X %in% c(146, 147, 148, 149, 150) ~ 3,
                                      ECO_CODE_X %in% c(152) ~ 4,
@@ -88,10 +88,10 @@ data_gcrmn_regions <- st_read("data/meow/Marine_Ecoregions_Of_the_World__MEOW_.s
                                      ECO_CODE_X %in% c(43, 69, 70) ~ 5,
                                      TRUE ~ NA_integer_)) %>% 
   st_as_sf() %>% 
-  group_by(gcrmn_region, gcrmn_subregion) %>% 
+  group_by(region, subregion) %>% 
   summarise() %>% 
   ungroup() %>% 
-  drop_na(gcrmn_region, gcrmn_subregion) %>% 
+  drop_na(region, subregion) %>% 
   st_as_sf()
 
 # 3. Fill holes within polygons ----
@@ -115,8 +115,8 @@ st_write(obj = data_gcrmn_subregions, dsn = "data/gcrmn-regions/gcrmn_subregions
 ## 4.2 GCRMN regions ----
 
 data_gcrmn_regions <- data_gcrmn_regions %>% 
-  select(-gcrmn_subregion) %>% 
-  group_by(gcrmn_region) %>% 
+  select(-subregion) %>% 
+  group_by(region) %>% 
   summarise(geometry = st_union(geometry)) %>% 
   ungroup()
 
@@ -160,7 +160,7 @@ ggplot() +
   geom_sf(data = background_map_border, fill = "white", color = "grey30", linewidth = 0.25) +
   geom_sf(data = data_graticules, color = "#ecf0f1", linewidth = 0.25) +
   geom_sf(data = background_map_border, fill = NA, color = "grey30", linewidth = 0.25) +
-  geom_sf(data = data_gcrmn_regions, aes(fill = gcrmn_region)) +
+  geom_sf(data = data_gcrmn_regions, aes(fill = region)) +
   geom_sf(data = data_country, color = "#24252a", fill = "#dadfe1") +
   theme(text = element_text(family = "Open Sans"),
         legend.position = "bottom",
