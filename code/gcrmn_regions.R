@@ -88,7 +88,8 @@ data_gcrmn_regions <- st_read("data/meow/Marine_Ecoregions_Of_the_World__MEOW_.s
                                      ECO_CODE_X %in% c(43, 69, 70) ~ 5,
                                      TRUE ~ NA_integer_)) %>% 
   st_as_sf() %>% 
-  group_by(region, subregion) %>% 
+  rename(ecoregion = ECOREGION) %>% 
+  group_by(region, subregion, ecoregion) %>% 
   summarise() %>% 
   ungroup() %>% 
   drop_na(region, subregion) %>% 
@@ -102,9 +103,29 @@ data_gcrmn_regions <- nngeo::st_remove_holes(data_gcrmn_regions) %>%
 
 # 4. Export the data ----
 
-## 4.1 GCRMN subregions ----
+## 4.1 Ecoregions ----
 
-data_gcrmn_subregions <- nngeo::st_remove_holes(data_gcrmn_regions) %>% 
+data_gcrmn_ecoregions <- data_gcrmn_regions %>% 
+  group_by(ecoregion) %>% 
+  summarise(geometry = st_union(geometry)) %>% 
+  ungroup()
+
+data_gcrmn_ecoregions <- nngeo::st_remove_holes(data_gcrmn_ecoregions) %>% 
+  st_transform(crs = 4326) %>% 
+  st_make_valid()
+
+save(data_gcrmn_ecoregions, file = "data/gcrmn-regions/gcrmn_ecoregions.RData")
+
+st_write(obj = data_gcrmn_ecoregions, dsn = "data/gcrmn-regions/gcrmn_ecoregions.shp", delete_dsn = TRUE)
+
+## 4.2 GCRMN subregions ----
+
+data_gcrmn_subregions <- data_gcrmn_regions %>% 
+  select(-ecoregion) %>% 
+  group_by(subregion, region) %>% 
+  summarise(geometry = st_union(geometry)) %>% 
+  ungroup() %>% 
+  nngeo::st_remove_holes(.) %>% 
   st_transform(crs = 4326) %>% 
   st_make_valid()
 
@@ -112,10 +133,10 @@ save(data_gcrmn_subregions, file = "data/gcrmn-regions/gcrmn_subregions.RData")
 
 st_write(obj = data_gcrmn_subregions, dsn = "data/gcrmn-regions/gcrmn_subregions.shp", delete_dsn = TRUE)
 
-## 4.2 GCRMN regions ----
+## 4.3 GCRMN regions ----
 
 data_gcrmn_regions <- data_gcrmn_regions %>% 
-  select(-subregion) %>% 
+  select(-subregion, -ecoregion) %>% 
   group_by(region) %>% 
   summarise(geometry = st_union(geometry)) %>% 
   ungroup()
