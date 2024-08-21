@@ -122,6 +122,7 @@ st_write(obj = data_gcrmn_ecoregions, dsn = "data/gcrmn-regions/gcrmn_ecoregions
 
 data_gcrmn_subregions <- data_gcrmn_regions %>% 
   select(-ecoregion) %>% 
+  mutate(subregion = paste(region, subregion, sep = " ")) %>% 
   group_by(subregion, region) %>% 
   summarise(geometry = st_union(geometry)) %>% 
   ungroup() %>% 
