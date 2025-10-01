@@ -78,8 +78,9 @@ data_gcrmn_regions <- st_read("data/meow/Marine_Ecoregions_Of_the_World__MEOW_.s
                                      # Brazil
                                      ECO_CODE_X %in% c(74) ~ 1,
                                      ECO_CODE_X %in% c(75) ~ 2,
-                                     ECO_CODE_X %in% c(76, 77) ~ 3,
-                                     ECO_CODE_X %in% c(71, 72) ~ 4,
+                                     ECO_CODE_X %in% c(76) ~ 3,
+                                     ECO_CODE_X %in% c(77) ~ 4,
+                                     ECO_CODE_X %in% c(71, 72) ~ 5,
                                      # Caribbean
                                      ECO_CODE_X %in% c(62, 63) ~ 1,
                                      ECO_CODE_X %in% c(64, 66) ~ 2,
