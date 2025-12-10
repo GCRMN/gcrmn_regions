@@ -198,7 +198,7 @@ rm(data_rectangle, data_eez_yemen)
 ## 5.1 Ecoregions ----
 
 data_gcrmn_ecoregions <- data_gcrmn_regions %>% 
-  group_by(ecoregion) %>% 
+  group_by(region, subregion, ecoregion) %>% 
   summarise(geometry = st_union(geometry)) %>% 
   ungroup()
 
@@ -215,7 +215,7 @@ st_write(obj = data_gcrmn_ecoregions, dsn = "data/gcrmn-regions/gcrmn_ecoregions
 data_gcrmn_subregions <- data_gcrmn_regions %>% 
   select(-ecoregion) %>% 
   mutate(subregion = paste(region, subregion, sep = " ")) %>% 
-  group_by(subregion, region) %>% 
+  group_by(region, subregion) %>% 
   summarise(geometry = st_union(geometry)) %>% 
   ungroup() %>% 
   nngeo::st_remove_holes(.) %>% 
