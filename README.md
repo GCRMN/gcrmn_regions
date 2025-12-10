@@ -2,7 +2,7 @@
 
 ## 1. Introduction
 
-The goal of this repository is to provide the R code used to create the 10 GCRMN (*Global Coral Reef Monitoring Network*) regions and the 48 GCRMN subregions from MEOW dataset. The GCRMN regions are the following:
+The goal of this repository is to provide the R code used to create the 10 GCRMN (*Global Coral Reef Monitoring Network*) regions and the 53 GCRMN subregions from MEOW dataset. The GCRMN regions are the following:
 
 * Australia
 * Brazil
