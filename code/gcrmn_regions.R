@@ -123,14 +123,14 @@ data_persga2 <- matrix(c(
   35.724, 23.956,
   35.619, 23.961,
   35.490, 24.051,
-  31.379, 23.155), # closing (repeat the fisrt line)
+  31.379, 23.155), # closing (repeat the first line)
   ncol = 2, byrow = TRUE) %>% 
   list(.) %>% 
   st_polygon() %>% 
   st_sfc(., crs = 4326) %>% 
   st_as_sf()
   
-## 4.2 
+## 4.2 Intersect with other polygons ----
 
 data_persga1_before <- data_gcrmn_regions %>% 
   filter(region == "PERSGA" & subregion == 1)
@@ -138,12 +138,12 @@ data_persga1_before <- data_gcrmn_regions %>%
 persga2 <- st_intersection(data_persga1_before, data_persga2) %>% 
   mutate(region = "PERSGA",
          subregion = 2,
-         ecoregion = "Northern and Central Red Sea")
+         ecoregion = "Central Red Sea")
 
 persga1 <- st_difference(data_persga1_before, data_persga2) %>% 
   mutate(region = "PERSGA",
          subregion = 1,
-         ecoregion = "Northern and Central Red Sea")
+         ecoregion = "Northern Red Sea")
   
 data_gcrmn_regions <- data_gcrmn_regions %>% 
   filter(!(region == "PERSGA" & subregion == 1)) %>% 
@@ -152,9 +152,50 @@ data_gcrmn_regions <- data_gcrmn_regions %>%
   
 rm(persga1, persga2, data_persga1_before, data_persga2)
 
-# 4. Export the data ----
+# 5. Change PERSGA / ROPME boundary ----
 
-## 4.1 Ecoregions ----
+data_eez_yemen <- st_read("data/eez/eez_v12.shp") %>% 
+  filter(SOVEREIGN1 == "Yemen")
+
+data_persga_4 <- data_gcrmn_regions %>% 
+  filter(region == "PERSGA" & subregion == 4)
+  
+data_eez_yemen <- st_difference(data_eez_yemen, data_persga_4) %>% 
+  st_cast("POLYGON") %>% 
+  filter(row_number() == 4)
+
+data_rectangle <- matrix(c(
+  47.5, as.numeric(st_bbox(data_persga_4)$ymax),
+  53.10934, as.numeric(st_bbox(data_eez_yemen)$ymax),
+  52.5, 12,
+  47.5, 12,
+  47.5, as.numeric(st_bbox(data_persga_4)$ymax)), # closing (repeat the first line)
+  ncol = 2, byrow = TRUE) %>% 
+  list(.) %>% 
+  st_polygon() %>% 
+  st_sfc(., crs = 4326) %>% 
+  st_as_sf()
+
+data_persga_4 <- st_union(data_persga_4, data_eez_yemen) %>% 
+  st_union(., data_rectangle) %>% 
+  select(region, subregion, ecoregion)
+
+data_ropme_3 <- data_gcrmn_regions %>% 
+  filter(region == "ROPME" & subregion == 3) %>% 
+  st_difference(., data_persga_4) %>% 
+  select(region, subregion, ecoregion)
+
+data_gcrmn_regions <- data_gcrmn_regions %>% 
+  filter(!(region == "PERSGA" & subregion == 4)) %>% 
+  filter(!(region == "ROPME" & subregion == 3)) %>% 
+  bind_rows(., data_persga_4) %>% 
+  bind_rows(., data_ropme_3)
+
+rm(data_rectangle, data_eez_yemen)
+
+# 5. Export the data ----
+
+## 5.1 Ecoregions ----
 
 data_gcrmn_ecoregions <- data_gcrmn_regions %>% 
   group_by(ecoregion) %>% 
@@ -169,7 +210,7 @@ save(data_gcrmn_ecoregions, file = "data/gcrmn-regions/gcrmn_ecoregions.RData")
 
 st_write(obj = data_gcrmn_ecoregions, dsn = "data/gcrmn-regions/gcrmn_ecoregions.shp", delete_dsn = TRUE)
 
-## 4.2 GCRMN subregions ----
+## 5.2 GCRMN subregions ----
 
 data_gcrmn_subregions <- data_gcrmn_regions %>% 
   select(-ecoregion) %>% 
@@ -185,7 +226,7 @@ save(data_gcrmn_subregions, file = "data/gcrmn-regions/gcrmn_subregions.RData")
 
 st_write(obj = data_gcrmn_subregions, dsn = "data/gcrmn-regions/gcrmn_subregions.shp", delete_dsn = TRUE)
 
-## 4.3 GCRMN regions ----
+## 5.3 GCRMN regions ----
 
 data_gcrmn_regions <- data_gcrmn_regions %>% 
   select(-subregion, -ecoregion) %>% 
@@ -201,9 +242,9 @@ save(data_gcrmn_regions, file = "data/gcrmn-regions/gcrmn_regions.RData")
 
 st_write(obj = data_gcrmn_regions, dsn = "data/gcrmn-regions/gcrmn_regions.shp", delete_dsn = TRUE)
 
-# 5. Make the plot ----
+# 6. Make the plot ----
 
-## 5.1 Load Natural Earth Data ----
+## 6.1 Load Natural Earth Data ----
 
 data_country <- st_read("data/natural-earth-data/ne_10m_admin_0_countries/ne_10m_admin_0_countries.shp") %>% 
   st_transform(crs = "+proj=eqearth")
@@ -211,12 +252,12 @@ data_country <- st_read("data/natural-earth-data/ne_10m_admin_0_countries/ne_10m
 data_graticules <- st_read("data/natural-earth-data/ne_10m_graticules_20/ne_10m_graticules_20.shp")%>% 
   st_transform(crs = "+proj=eqearth")
 
-## 5.2 Change projection of GCRMN regions ----
+## 6.2 Change projection of GCRMN regions ----
 
 data_gcrmn_regions <- data_gcrmn_regions %>% 
   st_transform(crs = "+proj=eqearth")
 
-## 5.3 Create the border of background map ----
+## 6.3 Create the border of background map ----
 
 lats <- c(90:-90, -90:90, 90)
 longs <- c(rep(c(180, -180), each = 181), 180)
@@ -227,7 +268,7 @@ background_map_border <- list(cbind(longs, lats)) %>%
   st_sf() %>%
   st_transform(crs = "+proj=eqearth")
 
-## 5.4 Create the plot ----
+## 6.4 Create the plot ----
 
 ggplot() +
   geom_sf(data = background_map_border, fill = "white", color = "grey30", linewidth = 0.25) +
