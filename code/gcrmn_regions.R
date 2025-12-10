@@ -198,6 +198,7 @@ rm(data_rectangle, data_eez_yemen)
 ## 5.1 Ecoregions ----
 
 data_gcrmn_ecoregions <- data_gcrmn_regions %>% 
+  mutate(subregion = paste(region, subregion, sep = " ")) %>% 
   group_by(region, subregion, ecoregion) %>% 
   summarise(geometry = st_union(geometry)) %>% 
   ungroup()
