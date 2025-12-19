@@ -98,7 +98,10 @@ data_gcrmn_regions <- st_read("data/meow/Marine_Ecoregions_Of_the_World__MEOW_.s
   summarise() %>% 
   ungroup() %>% 
   drop_na(region, subregion) %>% 
-  st_as_sf()
+  st_as_sf() %>% 
+  mutate(ecoregion = str_replace_all(ecoregion,
+  "Fernando de Naronha and Atoll das Rocas",
+  "Fernando de Noronha and Rocas Atoll"))
 
 # 3. Fill holes within polygons ----
 
@@ -191,7 +194,7 @@ data_gcrmn_regions <- data_gcrmn_regions %>%
   bind_rows(., data_persga_4) %>% 
   bind_rows(., data_ropme_3)
 
-rm(data_rectangle, data_eez_yemen)
+rm(data_rectangle, data_eez_yemen, data_persga_4, data_ropme_3)
 
 # 5. Export the data ----
 
