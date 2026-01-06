@@ -16,7 +16,7 @@ data_gcrmn_regions <- st_read("data/meow/Marine_Ecoregions_Of_the_World__MEOW_.s
                             ECO_CODE_X %in% c(87, 88, 89) ~ "PERSGA",
                             ECO_CODE_X %in% c(103, 104, 105, 106, 107, 108) ~ "South Asia",
                             ECO_CODE_X %in% c(93, 94, 95, 96, 97, 98, 99, 100, 101, 102) ~ "WIO",
-                            ECO_CODE_X %in% c(71, 72, 73, 74, 75, 76, 77) ~ "Brazil",
+                            ECO_CODE_X %in% c(72, 73, 74, 75, 76, 77) ~ "Brazil",
                             ECO_CODE_X %in% c(62, 63, 64, 65, 66, 67, 68, 69, 70, 43) ~ "Caribbean",
                             ECO_CODE_X %in% c(60, 61, 164, 165, 166, 167, 168, 
                                               169, 170, 171, 172, 173, 174) ~ "ETP",
@@ -83,7 +83,7 @@ data_gcrmn_regions <- st_read("data/meow/Marine_Ecoregions_Of_the_World__MEOW_.s
     ECO_CODE_X %in% c(75) ~ 2,
     ECO_CODE_X %in% c(76) ~ 3,
     ECO_CODE_X %in% c(77) ~ 4,
-    ECO_CODE_X %in% c(71, 72) ~ 5,
+    ECO_CODE_X %in% c(72) ~ 5,
     # Caribbean
     ECO_CODE_X %in% c(62, 63) ~ 1,
     ECO_CODE_X %in% c(64) ~ 2,
@@ -196,9 +196,9 @@ data_gcrmn_regions <- data_gcrmn_regions %>%
 
 rm(data_rectangle, data_eez_yemen, data_persga_4, data_ropme_3)
 
-# 5. Export the data ----
+# 6. Export the data ----
 
-## 5.1 Ecoregions ----
+## 6.1 Ecoregions ----
 
 data_gcrmn_ecoregions <- data_gcrmn_regions %>% 
   mutate(subregion = paste(region, subregion, sep = " ")) %>% 
@@ -214,7 +214,7 @@ save(data_gcrmn_ecoregions, file = "data/gcrmn-regions/gcrmn_ecoregions.RData")
 
 st_write(obj = data_gcrmn_ecoregions, dsn = "data/gcrmn-regions/gcrmn_ecoregions.shp", delete_dsn = TRUE)
 
-## 5.2 GCRMN subregions ----
+## 6.2 GCRMN subregions ----
 
 data_gcrmn_subregions <- data_gcrmn_regions %>% 
   select(-ecoregion) %>% 
@@ -230,7 +230,7 @@ save(data_gcrmn_subregions, file = "data/gcrmn-regions/gcrmn_subregions.RData")
 
 st_write(obj = data_gcrmn_subregions, dsn = "data/gcrmn-regions/gcrmn_subregions.shp", delete_dsn = TRUE)
 
-## 5.3 GCRMN regions ----
+## 6.3 GCRMN regions ----
 
 data_gcrmn_regions <- data_gcrmn_regions %>% 
   select(-subregion, -ecoregion) %>% 
@@ -246,9 +246,9 @@ save(data_gcrmn_regions, file = "data/gcrmn-regions/gcrmn_regions.RData")
 
 st_write(obj = data_gcrmn_regions, dsn = "data/gcrmn-regions/gcrmn_regions.shp", delete_dsn = TRUE)
 
-# 6. Make the plot ----
+# 7. Make the plot ----
 
-## 6.1 Load Natural Earth Data ----
+## 7.1 Load Natural Earth Data ----
 
 data_country <- st_read("data/natural-earth-data/ne_10m_admin_0_countries/ne_10m_admin_0_countries.shp") %>% 
   st_transform(crs = "+proj=eqearth")
@@ -256,12 +256,12 @@ data_country <- st_read("data/natural-earth-data/ne_10m_admin_0_countries/ne_10m
 data_graticules <- st_read("data/natural-earth-data/ne_10m_graticules_20/ne_10m_graticules_20.shp")%>% 
   st_transform(crs = "+proj=eqearth")
 
-## 6.2 Change projection of GCRMN regions ----
+## 7.2 Change projection of GCRMN regions ----
 
 data_gcrmn_regions <- data_gcrmn_regions %>% 
   st_transform(crs = "+proj=eqearth")
 
-## 6.3 Create the border of background map ----
+## 7.3 Create the border of background map ----
 
 lats <- c(90:-90, -90:90, 90)
 longs <- c(rep(c(180, -180), each = 181), 180)
@@ -272,7 +272,7 @@ background_map_border <- list(cbind(longs, lats)) %>%
   st_sf() %>%
   st_transform(crs = "+proj=eqearth")
 
-## 6.4 Create the plot ----
+## 7.4 Create the plot ----
 
 ggplot() +
   geom_sf(data = background_map_border, fill = "white", color = "grey30", linewidth = 0.25) +
