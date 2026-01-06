@@ -24,7 +24,7 @@ The goal of this repository is to provide the R code used to create the 10 GCRMN
 
 The raw data used to create the GCRMN regions, subregions, and ecoregions, were derived from the *Marine Ecoregions of the World* ([Spalding *et al.*, 2007](https://doi.org/10.1641/B570707)) and the World Exclusive Economic Zones ([Flanders Marine Institute, 2023](https://www.marineregions.org/downloads.php)).
 
-The ecoregions were aggregated to create the 10 GCRMN regions, the 53 GCRMN subregions, and the 111 GCRMN ecoregions. The resulting data are located in `data\gcrmn-regions`, either in RData (*gcrmn_regions.RData*, *gcrmn_subregions.RData*, and *gcrmn_ecoregions.RData*) or in shapefile format (*gcrmn_regions.shp*, *gcrmn_subregions.shp*, and *gcrmn_ecoregions.shp*).
+The ecoregions were aggregated to create the 10 GCRMN regions, the 53 GCRMN subregions, and the 110 GCRMN ecoregions. The resulting data are located in `data\gcrmn-regions`, either in RData (*gcrmn_regions.RData*, *gcrmn_subregions.RData*, and *gcrmn_ecoregions.RData*) or in shapefile format (*gcrmn_regions.shp*, *gcrmn_subregions.shp*, and *gcrmn_ecoregions.shp*).
 
 
 ## 3. How to cite this dataset?
