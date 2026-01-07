@@ -196,13 +196,71 @@ data_gcrmn_regions <- data_gcrmn_regions %>%
 
 rm(data_rectangle, data_eez_yemen, data_persga_4, data_ropme_3)
 
-# 6. Export the data ----
+# 6. Add subregion names ----
 
-## 6.1 Ecoregions ----
+data_gcrmn_regions <- data_gcrmn_regions %>% 
+  mutate(subregion_name = case_when(region == "Australia" & subregion == 1 ~ "Cocos Keeling and Christmas Island",
+                                    region == "Australia" & subregion == 2 ~ "Central West Australian Shelf",
+                                    region == "Australia" & subregion == 3 ~ "Northwest Australian Shelf",
+                                    region == "Australia" & subregion == 4 ~ "Northern Australia",
+                                    region == "Australia" & subregion == 5 ~ "Eastern Australian shelf / Great Barrier Reef",
+                                    region == "Australia" & subregion == 6 ~ "Coral Sea",
+                                    region == "Australia" & subregion == 7 ~ "Lord Howe and Norfolk Islands",
+                                    region == "Brazil" & subregion == 1 ~ "Fernando de Noronha and Rocas Atoll",
+                                    region == "Brazil" & subregion == 2 ~ "Northeastern Brazil",
+                                    region == "Brazil" & subregion == 3 ~ "Eastern Brazil",
+                                    region == "Brazil" & subregion == 4 ~ "Trindade and Martin Vaz Islands",
+                                    region == "Brazil" & subregion == 5 ~ "Amazonia",
+                                    region == "Caribbean" & subregion == 1 ~ "Bahamas and Bermuda",
+                                    region == "Caribbean" & subregion == 2 ~ "Eastern Caribbean",
+                                    region == "Caribbean" & subregion == 3 ~ "Southern Caribbean",
+                                    region == "Caribbean" & subregion == 4 ~ "Western Caribbean",
+                                    region == "Caribbean" & subregion == 5 ~ "Greater Antilles",
+                                    region == "Caribbean" & subregion == 6 ~ "Florida and Gulf of Mexico",
+                                    region == "EAS" & subregion == 1 ~ "Northern Coral Triangle",
+                                    region == "EAS" & subregion == 2 ~ "Central Coral Triangle",
+                                    region == "EAS" & subregion == 3 ~ "Sunda Shelf",
+                                    region == "EAS" & subregion == 4 ~ "Southern Java and Sunda",
+                                    region == "EAS" & subregion == 5 ~ "Andaman",
+                                    region == "EAS" & subregion == 6 ~ "South China Sea",
+                                    region == "EAS" & subregion == 7 ~ "Kuroshio",
+                                    region == "ETP" & subregion == 1 ~ "Southern Baja California",
+                                    region == "ETP" & subregion == 2 ~ "Central America",
+                                    region == "ETP" & subregion == 3 ~ "Panama Bight",
+                                    region == "ETP" & subregion == 4 ~ "Galapagos",
+                                    region == "ETP" & subregion == 5 ~ "Revillagigedos and Clipperton",
+                                    region == "Pacific" & subregion == 1 ~ "Tropical Northwestern Pacific",
+                                    region == "Pacific" & subregion == 2 ~ "Eastern Coral Triangle",
+                                    region == "Pacific" & subregion == 3 ~ "Tropical Southwestern Pacific",
+                                    region == "Pacific" & subregion == 4 ~ "Hawaiian archipelago",
+                                    region == "Pacific" & subregion == 5 ~ "Marshall, Gilbert, and Ellis Islands",
+                                    region == "Pacific" & subregion == 6 ~ "Central Polynesia",
+                                    region == "Pacific" & subregion == 7 ~ "Southeast Polynesia",
+                                    region == "PERSGA" & subregion == 1 ~ "Northern Red Sea",
+                                    region == "PERSGA" & subregion == 2 ~ "Central Red Sea",
+                                    region == "PERSGA" & subregion == 3 ~ "Southern Red Sea",
+                                    region == "PERSGA" & subregion == 4 ~ "Gulf of Aden",
+                                    region == "ROPME" & subregion == 1 ~ "Persian/Arabian Gulf",
+                                    region == "ROPME" & subregion == 2 ~ "Gulf of Oman",
+                                    region == "ROPME" & subregion == 3 ~ "Southern Oman",
+                                    region == "South Asia" & subregion == 1 ~ "Chagos",
+                                    region == "South Asia" & subregion == 2 ~ "Maldives",
+                                    region == "South Asia" & subregion == 3 ~ "West and South Indian Shelf",
+                                    region == "South Asia" & subregion == 4 ~ "Bay of Bengal",
+                                    region == "WIO" & subregion == 1 ~ "East African Coast",
+                                    region == "WIO" & subregion == 2 ~ "Seychelles",
+                                    region == "WIO" & subregion == 3 ~ "Mascarene Islands",
+                                    region == "WIO" & subregion == 4 ~ "Madagascar and Comoros",
+                                    region == "WIO" & subregion == 5 ~ "Bight of Sofala")) %>% 
+  mutate(subregion = paste(region, subregion, sep = " "))
+
+# 7. Export the data ----
+
+## 7.1 Ecoregions ----
 
 data_gcrmn_ecoregions <- data_gcrmn_regions %>% 
   mutate(subregion = paste(region, subregion, sep = " ")) %>% 
-  group_by(region, subregion, ecoregion) %>% 
+  group_by(region, subregion, subregion_name, ecoregion) %>% 
   summarise(geometry = st_union(geometry)) %>% 
   ungroup()
 
@@ -214,12 +272,11 @@ save(data_gcrmn_ecoregions, file = "data/gcrmn-regions/gcrmn_ecoregions.RData")
 
 st_write(obj = data_gcrmn_ecoregions, dsn = "data/gcrmn-regions/gcrmn_ecoregions.shp", delete_dsn = TRUE)
 
-## 6.2 GCRMN subregions ----
+## 7.2 GCRMN subregions ----
 
 data_gcrmn_subregions <- data_gcrmn_regions %>% 
   select(-ecoregion) %>% 
-  mutate(subregion = paste(region, subregion, sep = " ")) %>% 
-  group_by(region, subregion) %>% 
+  group_by(region, subregion, subregion_name) %>% 
   summarise(geometry = st_union(geometry)) %>% 
   ungroup() %>% 
   nngeo::st_remove_holes(.) %>% 
@@ -230,10 +287,10 @@ save(data_gcrmn_subregions, file = "data/gcrmn-regions/gcrmn_subregions.RData")
 
 st_write(obj = data_gcrmn_subregions, dsn = "data/gcrmn-regions/gcrmn_subregions.shp", delete_dsn = TRUE)
 
-## 6.3 GCRMN regions ----
+## 7.3 GCRMN regions ----
 
 data_gcrmn_regions <- data_gcrmn_regions %>% 
-  select(-subregion, -ecoregion) %>% 
+  select(-subregion, -subregion_name, -ecoregion) %>% 
   group_by(region) %>% 
   summarise(geometry = st_union(geometry)) %>% 
   ungroup()
@@ -246,9 +303,9 @@ save(data_gcrmn_regions, file = "data/gcrmn-regions/gcrmn_regions.RData")
 
 st_write(obj = data_gcrmn_regions, dsn = "data/gcrmn-regions/gcrmn_regions.shp", delete_dsn = TRUE)
 
-# 7. Make the plot ----
+# 8. Make the plot ----
 
-## 7.1 Load Natural Earth Data ----
+## 8.1 Load Natural Earth Data ----
 
 data_country <- st_read("data/natural-earth-data/ne_10m_admin_0_countries/ne_10m_admin_0_countries.shp") %>% 
   st_transform(crs = "+proj=eqearth")
@@ -256,12 +313,12 @@ data_country <- st_read("data/natural-earth-data/ne_10m_admin_0_countries/ne_10m
 data_graticules <- st_read("data/natural-earth-data/ne_10m_graticules_20/ne_10m_graticules_20.shp")%>% 
   st_transform(crs = "+proj=eqearth")
 
-## 7.2 Change projection of GCRMN regions ----
+## 8.2 Change projection of GCRMN regions ----
 
 data_gcrmn_regions <- data_gcrmn_regions %>% 
   st_transform(crs = "+proj=eqearth")
 
-## 7.3 Create the border of background map ----
+## 8.3 Create the border of background map ----
 
 lats <- c(90:-90, -90:90, 90)
 longs <- c(rep(c(180, -180), each = 181), 180)
@@ -272,7 +329,7 @@ background_map_border <- list(cbind(longs, lats)) %>%
   st_sf() %>%
   st_transform(crs = "+proj=eqearth")
 
-## 7.4 Create the plot ----
+## 8.4 Create the plot ----
 
 ggplot() +
   geom_sf(data = background_map_border, fill = "white", color = "grey30", linewidth = 0.25) +
