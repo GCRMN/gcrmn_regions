@@ -259,7 +259,6 @@ data_gcrmn_regions <- data_gcrmn_regions %>%
 ## 7.1 Ecoregions ----
 
 data_gcrmn_ecoregions <- data_gcrmn_regions %>% 
-  mutate(subregion = paste(region, subregion, sep = " ")) %>% 
   group_by(region, subregion, subregion_name, ecoregion) %>% 
   summarise(geometry = st_union(geometry)) %>% 
   ungroup()
