@@ -10,7 +10,7 @@ The goal of this repository is to provide the R code used to create the 10 GCRMN
 * EAS = East Asian Seas
 * ETP = Eastern Tropical Pacific
 * Pacific
-* PERSGA = Regional Organization for the Conservation of the Environment of the Red Sea and Gulf of Aden
+* RSGA = Red Sea and Gulf of Aden
 * ROPME = Regional Organization for the Protection of the Marine Environment
 * South Asia
 * WIO = Western Indian Ocean
