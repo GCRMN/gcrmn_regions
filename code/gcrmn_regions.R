@@ -13,7 +13,7 @@ data_gcrmn_regions <- st_read("data/meow/Marine_Ecoregions_Of_the_World__MEOW_.s
   mutate(region = case_when(ECO_CODE_X %in% c(202, 203, 204, 205, 206, 207, 208, 209, 210, 211,
                                               120, 145, 144, 141, 140, 142, 143, 150, 151) ~ "Australia",
                             ECO_CODE_X %in% c(90, 91, 92) ~ "ROPME",
-                            ECO_CODE_X %in% c(87, 88, 89) ~ "PERSGA",
+                            ECO_CODE_X %in% c(87, 88, 89) ~ "RSGA",
                             ECO_CODE_X %in% c(103, 104, 105, 106, 107, 108) ~ "South Asia",
                             ECO_CODE_X %in% c(93, 94, 95, 96, 97, 98, 99, 100, 101, 102) ~ "WIO",
                             ECO_CODE_X %in% c(72, 73, 74, 75, 76, 77) ~ "Brazil",
@@ -33,7 +33,7 @@ data_gcrmn_regions <- st_read("data/meow/Marine_Ecoregions_Of_the_World__MEOW_.s
     ECO_CODE_X %in% c(90) ~ 1,
     ECO_CODE_X %in% c(91) ~ 2,
     ECO_CODE_X %in% c(92) ~ 3,
-    # PERSGA
+    # RSGA
     ECO_CODE_X %in% c(87) ~ 1,
     ECO_CODE_X %in% c(88) ~ 3,
     ECO_CODE_X %in% c(89) ~ 4,
@@ -109,13 +109,13 @@ data_gcrmn_regions <- nngeo::st_remove_holes(data_gcrmn_regions) %>%
   st_transform(crs = 4326) %>% 
   st_make_valid()
 
-# 4. Split PERGSA 1 into PERSGA 1 and 2 ----
+# 4. Split PERGSA 1 into RSGA 1 and 2 ----
 
-## 4.1 Create PERSGA 2 polygon ----
+## 4.1 Create RSGA 2 polygon ----
 
 # (The polygon was manually created on Google Earth Engine)
 
-data_persga2 <- matrix(c(
+data_rsga2 <- matrix(c(
   31.379, 23.155,
   32.544, 20.154,
   34.126, 17.910,
@@ -135,66 +135,66 @@ data_persga2 <- matrix(c(
   
 ## 4.2 Intersect with other polygons ----
 
-data_persga1_before <- data_gcrmn_regions %>% 
-  filter(region == "PERSGA" & subregion == 1)
+data_rsga1_before <- data_gcrmn_regions %>% 
+  filter(region == "RSGA" & subregion == 1)
 
-persga2 <- st_intersection(data_persga1_before, data_persga2) %>% 
-  mutate(region = "PERSGA",
+rsga2 <- st_intersection(data_rsga1_before, data_rsga2) %>% 
+  mutate(region = "RSGA",
          subregion = 2,
          ecoregion = "Central Red Sea")
 
-persga1 <- st_difference(data_persga1_before, data_persga2) %>% 
-  mutate(region = "PERSGA",
+rsga1 <- st_difference(data_rsga1_before, data_rsga2) %>% 
+  mutate(region = "RSGA",
          subregion = 1,
          ecoregion = "Northern Red Sea")
   
 data_gcrmn_regions <- data_gcrmn_regions %>% 
-  filter(!(region == "PERSGA" & subregion == 1)) %>% 
-  bind_rows(., persga2) %>% 
-  bind_rows(., persga1) 
+  filter(!(region == "RSGA" & subregion == 1)) %>% 
+  bind_rows(., rsga2) %>% 
+  bind_rows(., rsga1) 
   
-rm(persga1, persga2, data_persga1_before, data_persga2)
+rm(rsga1, rsga2, data_rsga1_before, data_rsga2)
 
-# 5. Change PERSGA / ROPME boundary ----
+# 5. Change RSGA / ROPME boundary ----
 
 data_eez_yemen <- st_read("data/eez/eez_v12.shp") %>% 
   filter(SOVEREIGN1 == "Yemen")
 
-data_persga_4 <- data_gcrmn_regions %>% 
-  filter(region == "PERSGA" & subregion == 4)
+data_rsga_4 <- data_gcrmn_regions %>% 
+  filter(region == "RSGA" & subregion == 4)
   
-data_eez_yemen <- st_difference(data_eez_yemen, data_persga_4) %>% 
+data_eez_yemen <- st_difference(data_eez_yemen, data_rsga_4) %>% 
   st_cast("POLYGON") %>% 
   filter(row_number() == 4)
 
 data_rectangle <- matrix(c(
-  47.5, as.numeric(st_bbox(data_persga_4)$ymax),
+  47.5, as.numeric(st_bbox(data_rsga_4)$ymax),
   53.10934, as.numeric(st_bbox(data_eez_yemen)$ymax),
   52.5, 12,
   47.5, 12,
-  47.5, as.numeric(st_bbox(data_persga_4)$ymax)), # closing (repeat the first line)
+  47.5, as.numeric(st_bbox(data_rsga_4)$ymax)), # closing (repeat the first line)
   ncol = 2, byrow = TRUE) %>% 
   list(.) %>% 
   st_polygon() %>% 
   st_sfc(., crs = 4326) %>% 
   st_as_sf()
 
-data_persga_4 <- st_union(data_persga_4, data_eez_yemen) %>% 
+data_rsga_4 <- st_union(data_rsga_4, data_eez_yemen) %>% 
   st_union(., data_rectangle) %>% 
   select(region, subregion, ecoregion)
 
 data_ropme_3 <- data_gcrmn_regions %>% 
   filter(region == "ROPME" & subregion == 3) %>% 
-  st_difference(., data_persga_4) %>% 
+  st_difference(., data_rsga_4) %>% 
   select(region, subregion, ecoregion)
 
 data_gcrmn_regions <- data_gcrmn_regions %>% 
-  filter(!(region == "PERSGA" & subregion == 4)) %>% 
+  filter(!(region == "RSGA" & subregion == 4)) %>% 
   filter(!(region == "ROPME" & subregion == 3)) %>% 
-  bind_rows(., data_persga_4) %>% 
+  bind_rows(., data_rsga_4) %>% 
   bind_rows(., data_ropme_3)
 
-rm(data_rectangle, data_eez_yemen, data_persga_4, data_ropme_3)
+rm(data_rectangle, data_eez_yemen, data_rsga_4, data_ropme_3)
 
 # 6. Add subregion names ----
 
@@ -236,10 +236,10 @@ data_gcrmn_regions <- data_gcrmn_regions %>%
                                     region == "Pacific" & subregion == 5 ~ "Marshall, Gilbert, and Ellis Islands",
                                     region == "Pacific" & subregion == 6 ~ "Central Polynesia",
                                     region == "Pacific" & subregion == 7 ~ "Southeast Polynesia",
-                                    region == "PERSGA" & subregion == 1 ~ "Northern Red Sea",
-                                    region == "PERSGA" & subregion == 2 ~ "Central Red Sea",
-                                    region == "PERSGA" & subregion == 3 ~ "Southern Red Sea",
-                                    region == "PERSGA" & subregion == 4 ~ "Gulf of Aden",
+                                    region == "RSGA" & subregion == 1 ~ "Northern Red Sea",
+                                    region == "RSGA" & subregion == 2 ~ "Central Red Sea",
+                                    region == "RSGA" & subregion == 3 ~ "Southern Red Sea",
+                                    region == "RSGA" & subregion == 4 ~ "Gulf of Aden",
                                     region == "ROPME" & subregion == 1 ~ "Persian/Arabian Gulf",
                                     region == "ROPME" & subregion == 2 ~ "Gulf of Oman",
                                     region == "ROPME" & subregion == 3 ~ "Southern Oman",
